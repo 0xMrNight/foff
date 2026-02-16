@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h3>Register New Student</h3>
+            <hr>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Rahman Dakait" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Roll Number</label>
+                    <input type="text" name="roll" class="form-control" placeholder="67" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Sleep Start (0-23)</label>
+                        <input type="number" name="sleep_start" class="form-control" min="0" max="23" value="22">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Sleep End (0-23)</label>
+                        <input type="number" name="sleep_end" class="form-control" min="0" max="23" value="6">
+                    </div>
+                </div>
+                <div class="d-grid mt-3">
+                    <button type="submit" class="btn btn-success">Save Student</button>
+                    <a href="/" class="btn btn-link">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

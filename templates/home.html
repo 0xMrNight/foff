@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center text-center">
+    <div class="col-md-8">
+        <h1 class="display-4 fw-bold mb-2">Student <span class="text-accent">Attention</span> Index</h1>
+        <!-- <p class="text-dim mb-5">Predicting focus levels through algorithmic modeling.</p> -->
+
+        <div class="glass-card mb-4">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr class="text-dim border-bottom border-secondary">
+                            <th class="py-3">STUDENT NAME</th>
+                            <th class="py-3">ROLL</th>
+                            <th class="py-3 text-end">ANALYTICS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr class="align-middle">
+                            <td class="py-3 fw-bold">{{ s[0] }}</td>
+                            <td class="py-3 text-dim"><code>{{ s[1] }}</code></td>
+                            <td class="py-3 text-end">
+                                <a href="/graph/{{ s[1] }}" class="btn btn-sm btn-outline-info rounded-pill px-3">View Report</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <a href="/register" class="btn btn-primary px-5 py-3">Register New Student</a>
+    </div>
+</div>
+{% endblock %}
