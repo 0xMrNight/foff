@@ -7,7 +7,6 @@ using behavioral simulation and regression modeling.
 ![Flask](https://img.shields.io/badge/Flask-WebApp-green)
 ![ML](https://img.shields.io/badge/Machine%20Learning-RandomForest-orange)
 ![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey)
-![Bootstrap](https://img.shields.io/badge/UI-Bootstrap-purple)
 
 ---
 
