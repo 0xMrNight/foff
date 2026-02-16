@@ -1,27 +1,49 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="row justify-content-center text-center">
-    <div class="col-md-8">
-        <h1 class="display-4 fw-bold mb-2">Student <span class="text-accent">Attention</span> Index</h1>
-        <!-- <p class="text-dim mb-5">Predicting focus levels through algorithmic modeling.</p> -->
 
-        <div class="glass-card mb-4">
+{% block content %}
+<div class="row justify-content-center text-center py-5">
+    <div class="col-md-10">
+        <header class="mb-5">
+            <h1 class="display-3 fw-bold mb-2">Student <span class="text-accent">Attention</span> Index</h1>
+            <p class="text-dim fs-5">Current System Observation: <span class="text-white fw-bold">{{ hour }}:00</span></p>
+        </header>
+
+        <div class="glass-card text-start">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Student Registry</h3>
+                <span class="badge bg-dark border border-secondary text-dim px-3 py-2">
+                    {{ students|length }} Active Students
+                </span>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-dark table-hover mb-0">
                     <thead>
-                        <tr class="text-dim border-bottom border-secondary">
-                            <th class="py-3">STUDENT NAME</th>
-                            <th class="py-3">ROLL</th>
-                            <th class="py-3 text-end">ANALYTICS</th>
+                        <tr class="text-dim border-bottom border-secondary" style="font-size: 0.85rem; letter-spacing: 1px;">
+                            <th class="py-3">SUBJECT NAME</th>
+                            <th class="py-3">ROLL IDENTIFIER</th>
+                            <th class="py-3 text-end">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for s in students %}
-                        <tr class="align-middle">
-                            <td class="py-3 fw-bold">{{ s[0] }}</td>
-                            <td class="py-3 text-dim"><code>{{ s[1] }}</code></td>
-                            <td class="py-3 text-end">
-                                <a href="/graph/{{ s[1] }}" class="btn btn-sm btn-outline-info rounded-pill px-3">View Report</a>
+                        <tr class="align-middle border-bottom border-secondary-subtle">
+                            <td class="py-4">
+                                <div class="fw-bold fs-5">{{ s[0] }}</div>
+                            </td>
+                            <td class="py-4">
+                                <code class="text-accent bg-dark px-2 py-1 rounded">{{ s[1] }}</code>
+                            </td>
+                            <td class="py-4 text-end">
+                                <a href="/graph/{{ s[1] }}" class="btn btn-sm btn-outline-info rounded-pill px-4 py-2">
+                                    View Analytics
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5 text-dim">
+                                No students registered in the database.
                             </td>
                         </tr>
                         {% endfor %}
@@ -30,7 +52,76 @@
             </div>
         </div>
 
-        <a href="/register" class="btn btn-primary px-5 py-3">Register New Student</a>
+        <div class="mt-5">
+            <a href="/register" class="btn btn-primary px-5 py-3 shadow-lg">
+                Register New Subject
+            </a>
+        </div>
     </div>
 </div>
+
+<div class="offcanvas offcanvas-end text-bg-dark border-start border-secondary" tabindex="-1" id="leaderboardWidget" style="background: #0b0e14 !important; width: 400px;">
+    <div class="offcanvas-header border-bottom border-secondary py-4">
+        <h5 class="offcanvas-title fw-bold">
+            <span class="me-2">🏆</span> LIVE <span class="text-accent">LEADERBOARD</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    
+    <div class="offcanvas-body p-4">
+        <p class="small text-dim mb-4 text-uppercase tracking-widest">Top Focus Levels - Hour {{ hour }}</p>
+        
+        {% for top in leaderboard %}
+        <div class="d-flex align-items-center mb-3 p-3 rounded-4 border {% if loop.index == 1 %}border-info glow-card{% else %}border-secondary{% endif %}" 
+             style="background: rgba(255,255,255,0.02);">
+            
+            <div class="rank-number h3 fw-bold me-3 {% if loop.index == 1 %}text-accent{% else %}text-dim{% endif %}">
+                {{ loop.index }}
+            </div>
+            
+            <div class="flex-grow-1">
+                <div class="fw-bold text-white">{{ top.name }}</div>
+                <div class="small text-dim" style="font-size: 0.75rem;">Roll: {{ top.roll }}</div>
+            </div>
+            
+            <div class="text-end">
+                <div class="h4 fw-bold mb-0 {% if top.is_sleeping %}text-muted{% else %}text-accent{% endif %}">
+                    {% if top.is_sleeping %}💤{% else %}{{ top.score }}%{% endif %}
+                </div>
+                <div class="small fw-bold" style="font-size: 0.6rem; color: #4b5563;">FOCUS</div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not leaderboard %}
+        <div class="text-center text-dim mt-5">
+            <p>No data available to rank.</p>
+        </div>
+        {% endif %}
+
+        <div class="mt-5 p-3 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25 text-center">
+            <p class="small text-info mb-0">
+                Data refreshes on page reload. <br>Calculated based on environmental noise and capacity.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glow-card {
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+        background: rgba(0, 212, 255, 0.05) !important;
+        animation: pulse-border 2s infinite alternate;
+    }
+
+    @keyframes pulse-border {
+        from { border-color: rgba(0, 212, 255, 0.3); }
+        to { border-color: rgba(0, 212, 255, 1); }
+    }
+
+    .rank-number {
+        min-width: 40px;
+    }
+</style>
+
 {% endblock %}

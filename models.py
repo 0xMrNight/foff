@@ -2,6 +2,11 @@ import sqlite3
 
 DB_PATH = "students.db"
 
+def get_all_student_details():
+    with sqlite3.connect(DB_PATH) as conn:
+        # capacity and sleep times to calculate current focus
+        return conn.execute("SELECT name, roll, capacity, sleep_start, sleep_end FROM students").fetchall()
+
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""

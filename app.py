@@ -7,14 +7,36 @@ import matplotlib.pyplot as plt
 import os
 import models
 import simulation
+from datetime import datetime
+
 
 app = Flask(__name__)
 models.init_db()
 
 @app.route("/")
 def home():
+    all_data = models.get_all_student_details()
+    current_hour = datetime.now().hour
+    leaderboard = []
+
+    for name, roll, cap, s_start, s_end in all_data:
+        score = simulation.calculate_attention(current_hour, cap, s_start, s_end)
+        # If score is None, student is sleeping (0 focus)
+        focus_val = score if score is not None else 0
+        leaderboard.append({
+            'name': name,
+            'roll': roll,
+            'score': focus_val,
+            'is_sleeping': score is None
+        })
+
+    # Sort by score descending
+    leaderboard = sorted(leaderboard, key=lambda x: x['score'], reverse=True)
+    
+    # We still need the basic list for the main table
     students = models.get_all_students()
-    return render_template("home.html", students=students)
+    
+    return render_template("home.html", students=students, leaderboard=leaderboard[:5], hour=current_hour)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
