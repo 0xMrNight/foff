@@ -56,49 +56,75 @@ def register():
 
 @app.route("/graph/<roll>")
 def graph(roll):
+    # 1. Fetch data from DB
     student = models.get_student_by_roll(roll)
-    if not student: return "Student not found", 404
+    if not student:
+        return "Student not found", 404
 
-    # 1. Prepare Data
+    # Unpack DB record (id, name, roll, capacity, sleep_start, sleep_end)
     _, name, _, capacity, s_start, s_end = student
+    
+    # 2. Generate simulation data and find the peak
     hours, scores = [], []
+    best_hour = None
+    max_score = -1
+
     for h in range(24):
         val = simulation.calculate_attention(h, capacity, s_start, s_end)
         if val is not None:
             hours.append(h)
             scores.append(val)
+            # Logic to find the highest focus hour
+            if val > max_score:
+                max_score = val
+                best_hour = h
 
-    plt.style.use('dark_background') # Makes the plot match the UI
-    plt.figure(figsize=(10, 5), facecolor='#1e293b') 
-    ax = plt.gca()
-    ax.set_facecolor('#1e293b')
+    # 3. Format the "Best Time" for the UI (e.g., 14 -> 2:00 PM)
+    if best_hour is not None:
+        time_suffix = "AM" if best_hour < 12 else "PM"
+        display_hour = best_hour if 1 <= best_hour <= 12 else abs(best_hour - 12)
+        if display_hour == 0: display_hour = 12
+        best_time_str = f"{display_hour}:00 {time_suffix}"
+    else:
+        best_time_str = "N/A"
 
-    plt.plot(hours, scores, marker='o', color='#38bdf8', linewidth=3, markersize=8, markerfacecolor='#ffffff')
-    plt.fill_between(hours, scores, color='#38bdf8', alpha=0.2)
+    # 4. Generate the Plot with Dark Mode styling
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(figsize=(10, 5), facecolor='#161b22')
+    ax.set_facecolor('#161b22')
 
-    # Grid and Spines styling
-    ax.grid(color='#334155', linestyle='--', alpha=0.5)
-    for spine in ax.spines.values():
-        spine.set_edgecolor('#475569')
-
-    plt.plot(hours, scores, marker='o', color='#007bff', linewidth=2)
-    plt.fill_between(hours, scores, color='#007bff', alpha=0.1)
-    plt.title(f"Attention Analytics: {name}")
-    plt.xlabel("Hour of Day")
-    plt.ylabel("Attention %")
-    plt.ylim(0, 105)
-    plt.grid(True, linestyle='--', alpha=0.6)
-
-    # 3. Save to a Buffer (Memory) instead of Disk
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')
-    buf.seek(0)
+    # Plotting the focus line
+    plt.plot(hours, scores, color='#00d4ff', linewidth=3, marker='o', 
+             markerfacecolor='#ffffff', markersize=6, label='Attention Level')
     
-    # 4. Encode as Base64 string
-    plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-    plt.close() # Always close the figure to free memory
+    # Fill the area under the curve
+    plt.fill_between(hours, scores, color='#00d4ff', alpha=0.15)
 
-    return render_template("graph.html", name=name, plot_url=plot_data)
+    # Customize Axes and Grid
+    plt.title(f"Focus Forecast: {name}", fontsize=16, pad=20, color='#ffffff')
+    plt.xlabel("Hour of Day (24h Format)", color='#8b949e')
+    plt.ylabel("Attention Percentage", color='#8b949e')
+    plt.ylim(0, 105)
+    plt.xticks(range(0, 24, 2))
+    plt.grid(color='#30363d', linestyle='--', alpha=0.5)
+    
+    # Remove plot borders (spines) for a cleaner look
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    # 5. Convert plot to Base64 string (In-Memory)
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight', facecolor=fig.get_facecolor())
+    buf.seek(0)
+    plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+    plt.close(fig)  # Crucial to prevent memory leaks
+
+    # 6. Render the updated graph.html with all variables
+    return render_template("graph.html", 
+                           name=name, 
+                           plot_url=plot_data, 
+                           best_time=best_time_str, 
+                           peak_score=round(max_score, 1))
 
 if __name__ == "__main__":
     app.run(debug=True)
