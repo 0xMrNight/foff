@@ -5,14 +5,14 @@
     <div class="col-md-10">
         <header class="mb-5">
             <h1 class="display-3 fw-bold mb-2">Student <span class="text-accent">Attention</span> Index</h1>
-            <p class="text-dim fs-5">Current System Observation: <span class="text-white fw-bold">{{ hour }}:00</span></p>
+            <p class="text-dim fs-5">Current Hour: <span class="text-white fw-bold">{{ hour }}</span></p>
         </header>
 
         <div class="glass-card text-start">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold mb-0">Student Registry</h3>
                 <span class="badge bg-dark border border-secondary text-dim px-3 py-2">
-                    {{ students|length }} Active Students
+                    {{ students|length }} Active Minds
                 </span>
             </div>
 
@@ -20,8 +20,8 @@
                 <table class="table table-dark table-hover mb-0">
                     <thead>
                         <tr class="text-dim border-bottom border-secondary" style="font-size: 0.85rem; letter-spacing: 1px;">
-                            <th class="py-3">SUBJECT NAME</th>
-                            <th class="py-3">ROLL IDENTIFIER</th>
+                            <th class="py-3">STUDENT NAME</th>
+                            <th class="py-3">ROLL NO</th>
                             <th class="py-3 text-end">ACTION</th>
                         </tr>
                     </thead>
@@ -36,14 +36,14 @@
                             </td>
                             <td class="py-4 text-end">
                                 <a href="/graph/{{ s[1] }}" class="btn btn-sm btn-outline-info rounded-pill px-4 py-2">
-                                    View Analytics
+                                    View Mind
                                 </a>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
                             <td colspan="3" class="text-center py-5 text-dim">
-                                No students registered in the database.
+                                No students registered.
                             </td>
                         </tr>
                         {% endfor %}
@@ -54,7 +54,7 @@
 
         <div class="mt-5">
             <a href="/register" class="btn btn-primary px-5 py-3 shadow-lg">
-                Register New Subject
+                Drink from the Fountain of Fluctuating Focus
             </a>
         </div>
     </div>
